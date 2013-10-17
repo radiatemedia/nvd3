@@ -17,6 +17,7 @@ nv.models.lineChart = function() {
     , width = null
     , height = null
     , showLegend = true
+    , legendOrientation = 'top'
     , showXAxis = true
     , showYAxis = true
     , rightAlignYAxis = false
@@ -153,14 +154,26 @@ nv.models.lineChart = function() {
             .datum(data)
             .call(legend);
 
-        if ( margin.top != legend.height()) {
-          margin.top = legend.height();
-          availableHeight = (height || parseInt(container.style('height')) || 400)
-                             - margin.top - margin.bottom;
+        var containerHeight = height || parseInt(container.style('height')) || 400;
+        var legendTransform = 0;
+        if (legendOrientation == 'bottom') {
+          //the legend should be at the bottom, but the full graph is shifted
+          //down by margin.top, so we need to subtract both to get the
+          //appropriate location
+          legendTransform = containerHeight - margin.top - legend.height();
+
+        //'top' orientation is the default
+        } else {
+          if ( margin.top != legend.height()) {
+            margin.top = legend.height();
+          }
+          legendTransform = -margin.top;
         }
 
+        availableHeight = containerHeight - margin.top - margin.bottom;
+
         wrap.select('.nv-legendWrap')
-            .attr('transform', 'translate(0,' + (-margin.top) +')')
+            .attr('transform', 'translate(0,' + legendTransform +')')
       }
 
       //------------------------------------------------------------
@@ -462,6 +475,12 @@ nv.models.lineChart = function() {
   chart.transitionDuration = function(_) {
     if (!arguments.length) return transitionDuration;
     transitionDuration = _;
+    return chart;
+  };
+
+  chart.legendOrientation = function(_) {
+    if (!arguments.length) return legendOrientation;
+    legendOrientation = _;
     return chart;
   };
 
