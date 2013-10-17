@@ -5575,7 +5575,6 @@ nv.models.lineChart = function() {
       // Legend
 
       if (showLegend) {
-        console.log(chart, that, container, this);
         legend.width(availableWidth);
 
         g.select('.nv-legendWrap')
