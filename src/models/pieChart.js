@@ -12,6 +12,7 @@ nv.models.pieChart = function() {
     , width = null
     , height = null
     , showLegend = true
+    , legendOrientation = 'top'
     , color = nv.utils.defaultColor()
     , tooltips = true
     , tooltip = function(key, y, e, graph) {
@@ -120,14 +121,20 @@ nv.models.pieChart = function() {
             .datum(data)
             .call(legend);
 
-        if ( margin.top != legend.height()) {
-          margin.top = legend.height();
-          availableHeight = (height || parseInt(container.style('height')) || 400)
-                             - margin.top - margin.bottom;
+        var containerHeight = (height || parseInt(container.style('height')) || 400)
+          , legendTransform = 0;
+        if (legendOrientation == 'bottom') {
+          legendTransform = containerHeight - margin.top - legend.height();
+        } else {
+          if (margin.top != legend.height()) {
+            margin.top = legend.height();
+          }
+          legendTransform = -margin.top;
         }
+        availableHeight = containerHeight - margin.top - margin.bottom;
 
         wrap.select('.nv-legendWrap')
-            .attr('transform', 'translate(0,' + (-margin.top) +')');
+            .attr('transform', 'translate(0,' + legendTransform  +')');
       }
 
       //------------------------------------------------------------
@@ -282,6 +289,11 @@ nv.models.pieChart = function() {
   chart.noData = function(_) {
     if (!arguments.length) return noData;
     noData = _;
+    return chart;
+  };
+  chart.legendOrientation = function(_) {
+    if (!arguments.length) return legendOrientation;
+    legendOrientation = _;
     return chart;
   };
 
