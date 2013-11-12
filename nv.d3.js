@@ -4860,6 +4860,7 @@ nv.models.indentedTree = function() {
     , width = 400
     , height = 20
     , labelPadding = 28 // 28 is ~ the width of the circle plus some padding
+    , columns = null
     , getKey = function(d) { return d.key }
     , color = nv.utils.defaultColor()
     , align = true
@@ -4964,6 +4965,11 @@ nv.models.indentedTree = function() {
 
       // NEW ALIGNING CODE, TODO: clean up
       if (align) {
+        if(columns) {
+          var widthModifier = columns / 4;
+          availableWidth = availableWidth * widthModifier;
+          margin.right = availableWidth * ((1 - widthModifier) / 2);
+        }
 
         var seriesWidths = [];
         series.each(function(d,i) {
@@ -4975,8 +4981,12 @@ nv.models.indentedTree = function() {
               catch(e) {
                 nodeTextLength = nv.utils.calcApproxTextWidth(legendText);
               }
-             
-              seriesWidths.push(nodeTextLength + labelPadding);
+
+              if (columns) {
+                seriesWidths.push(availableWidth / columns);
+              } else {
+                seriesWidths.push(nodeTextLength + labelPadding);
+              }
             });
 
         var seriesPerRow = 0;
@@ -5133,6 +5143,12 @@ nv.models.indentedTree = function() {
   chart.formatter = function(_) {
     if (!arguments.length) return formatter;
     formatter = _;
+    return chart;
+  };
+
+  chart.columns = function(_) {
+    if (!arguments.length) return columns;
+    columns = _;
     return chart;
   };
 
