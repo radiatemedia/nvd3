@@ -4967,7 +4967,7 @@ nv.models.indentedTree = function() {
       if (align) {
         if(columns) {
           var widthModifier = columns / 4;
-          availableWidth = availableWidth * widthModifier;
+          availableWidth = width * widthModifier;
           margin.right = availableWidth * ((1 - widthModifier) / 2);
         }
 
