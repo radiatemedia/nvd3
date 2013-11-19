@@ -44,6 +44,7 @@ svg {
   <div id="chart" class='with-3d-shadow with-transitions'>
     <svg style="height: 500px;"></svg>
   </div>
+  <button class="clear-focus">Clear focus</button>
 
 <script src="../lib/d3.v3.js"></script>
 <script src="../nv.d3.js"></script>
@@ -53,7 +54,7 @@ svg {
 <script src="../src/models/axis.js"></script>
 <script src="../src/models/scatter.js"></script>
 <script src="../src/models/line.js"></script>
-<script src="../src/models/lineWithZoomChart.js"></script>
+<script src="../src/models/lineWithInlineFocusChart.js"></script>
 <script src="stream_layers.js"></script>
 <script>
 
@@ -64,13 +65,11 @@ nv.addGraph(function() {
  // chart.transitionDuration(500);
   chart.xAxis
       .tickFormat(d3.format(',f'));
-  chart.x2Axis
-      .tickFormat(d3.format(',f'));
 
   chart.yAxis
       .tickFormat(d3.format(',.2f'));
-  chart.y2Axis
-      .tickFormat(d3.format(',.2f'));
+
+  chart.useInteractiveGuideline(true);
 
   d3.select('#chart svg')
       .datum(testData())
@@ -78,7 +77,10 @@ nv.addGraph(function() {
 
   nv.utils.windowResize(chart.update);
 
-  window.chart = chart;
+  d3.select('.clear-focus').on('click', function() {
+    chart.dispatch.clearFocus();
+  });
+
   return chart;
 });
 
@@ -92,6 +94,5 @@ function testData() {
     };
   });
 }
-
 
 </script>
