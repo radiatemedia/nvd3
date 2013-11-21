@@ -118,6 +118,7 @@ nv.models.lineWithInlineFocusChart = function() {
           .attr('y', margin.top + availableHeight / 2)
           .text(function(d) { return d });
 
+          container.selectAll('g.nv-wrap.nv-lineWithFocusChart').remove();
         return chart;
       } else {
         container.selectAll('.nv-noData').remove();
