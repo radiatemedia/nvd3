@@ -11995,6 +11995,9 @@ nv.models.scatter = function() {
             .attr('cy', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) })
             .remove();
         points.each(function(d,i) {
+          if (d.y == null) {
+            d3.select(this).classed('nv-point-null', true);
+          }
           d3.select(this)
             .classed('nv-point', true)
             .classed('nv-point-' + i, true)
