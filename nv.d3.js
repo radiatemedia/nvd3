@@ -4866,6 +4866,7 @@ nv.models.indentedTree = function() {
     , align = true
     , rightAlign = true
     , updateState = true   //If true, legend will update data.disabled and trigger a 'stateChange' dispatch.
+    , disableDoubleClick = false
     , radioButtonMode = false   //If true, clicking legend items will cause it to behave like a radio button. (only one can be selected at a time)
     , dispatch = d3.dispatch('legendClick', 'legendDblclick', 'legendMouseover', 'legendMouseout', 'stateChange')
     , formatter = function(seriesEnter, color, getKey) {
@@ -4942,7 +4943,7 @@ nv.models.indentedTree = function() {
           })
           .on('dblclick', function(d,i) {
             dispatch.legendDblclick(d,i);
-            if (updateState) {
+            if (updateState && !disableDoubleClick) {
                 //the default behavior of NVD3 legends, when double clicking one,
                 // is to set all other series' to false, and make the double clicked series enabled.
                 data.forEach(function(series) {
@@ -5149,6 +5150,12 @@ nv.models.indentedTree = function() {
   chart.columns = function(_) {
     if (!arguments.length) return columns;
     columns = _;
+    return chart;
+  };
+
+  chart.disableDoubleClick = function(_) {
+    if (!arguments.length) return disableDoubleClick;
+    disableDoubleClick = _;
     return chart;
   };
 
