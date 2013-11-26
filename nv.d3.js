@@ -4917,10 +4917,10 @@ nv.models.indentedTree = function() {
       // updating anything each time so that the indexes and the keys all match
       // up
       var series = g.selectAll('.nv-series')
-                     .data([], function(d, i) { return d['key'] });
+                     .data([], function(d, i) { return d['key'] || d['label'] });
       series.exit().remove();
       series = g.selectAll('.nv-series')
-                 .data(function(d) { return d }, function(d, i) { return d['key'] });
+                 .data(function(d) { return d }, function(d, i) { return d['key'] || d['label'] });
       var seriesEnter = series.enter().append('g').attr('class', 'nv-series')
           .on('mouseover', function(d,i) {
             dispatch.legendMouseover(d,i);  //TODO: Make consistent with other event objects
