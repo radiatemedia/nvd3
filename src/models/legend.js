@@ -58,8 +58,17 @@ nv.models.legend = function() {
       //------------------------------------------------------------
 
 
+      // small hack here, I'd like to remove at some point...need to update the
+      // data off of the key here, instead of the index, but then the colors
+      // remain the same when you remove something from the middle and the line
+      // chart colors are still index based, so I'm removing all elements before
+      // updating anything each time so that the indexes and the keys all match
+      // up
       var series = g.selectAll('.nv-series')
-          .data(function(d) { return d });
+                     .data([], function(d, i) { return d['key'] });
+      series.exit().remove();
+      series = g.selectAll('.nv-series')
+                 .data(function(d) { return d }, function(d, i) { return d['key'] });
       var seriesEnter = series.enter().append('g').attr('class', 'nv-series')
           .on('mouseover', function(d,i) {
             dispatch.legendMouseover(d,i);  //TODO: Make consistent with other event objects
