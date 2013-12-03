@@ -7641,6 +7641,9 @@ nv.models.lineWithInlineFocusChart = function() {
     , legend = nv.models.legend()
     , interactiveLayer = nv.interactiveGuideline()
     , brush = d3.svg.brush()
+    , allowBrushExtent = function(extent) {
+        return (Math.abs(extent[0] - extent[1]) > 1);
+      }
     ;
 
   var margin = {top: 30, right: 30, bottom: 30, left: 60}
@@ -8045,29 +8048,26 @@ nv.models.lineWithInlineFocusChart = function() {
       function onBrush() {
         brushExtent = brush.empty() ? null : brush.extent();
         var extent = brush.empty() ? x2.domain() : brush.extent();
+        var filteredData = data.filter(function(d) {
+          return !d.disabled;
+        }).map(function(d, i) {
+          return {
+            key: d.key,
+            values: d.values.filter(function(d, i) {
+              return lines.x()(d, i) >= extent[0] &&
+                lines.x()(d,i) <= extent[1];
+            })
+          }
+        });
 
-        //The brush extent cannot be less than one.  If it is, don't update the line chart.
-        if (Math.abs(extent[0] - extent[1]) <= 1) {
+        if (!allowBrushExtent(extent, filteredData)) {
+          dispatch.clearFocus();
           return;
         }
-
-        dispatch.brush({extent: extent, brush: brush});
-
-
+        dispatch.brush({extent: extent, brush: brush, filteredData: filteredData});
         // Update Main (Focus)
         var focusLinesWrap = g.select('.nv-focus .nv-linesWrap')
-            .datum(
-              data
-                .filter(function(d) { return !d.disabled })
-                .map(function(d,i) {
-                  return {
-                    key: d.key,
-                    values: d.values.filter(function(d,i) {
-                      return lines.x()(d,i) >= extent[0] && lines.x()(d,i) <= extent[1];
-                    })
-                  }
-                })
-            );
+            .datum(filteredData);
         focusLinesWrap.transition().duration(transitionDuration).call(lines);
 
 
@@ -8258,6 +8258,12 @@ nv.models.lineWithInlineFocusChart = function() {
     legendOrientation = _;
     return chart;
   };
+
+  chart.allowBrushExtent = function(_) {
+    if (!arguments.length) return allowBrushExtent;
+    allowBrushExtent = _;
+    return chart;
+  }
 
   //============================================================
 
