@@ -11,9 +11,6 @@ nv.models.lineWithInlineFocusChart = function() {
     , legend = nv.models.legend()
     , interactiveLayer = nv.interactiveGuideline()
     , brush = d3.svg.brush()
-    , allowBrushExtent = function(extent) {
-        return (Math.abs(extent[0] - extent[1]) > 1);
-      }
     ;
 
   var margin = {top: 30, right: 30, bottom: 30, left: 60}
@@ -272,12 +269,13 @@ nv.models.lineWithInlineFocusChart = function() {
       brush
         .x(x2)
         .on('brush', function() {
+            clampBrushExtent.call(this);
             g.select('rect.extent').style({display: 'block'});
         })
         .on('brushend', function() {
-          onBrush();
-          x2.domain(brush.empty() ? x.domain() : brush.extent());
-          g.select('rect.extent').style({display: 'none'});
+            onBrush.call(this);
+            x2.domain(brush.empty() ? x.domain() : brush.extent());
+            g.select('rect.extent').style({display: 'none'});
         });
 
       if (brushExtent) brush.extent(brushExtent);
@@ -414,30 +412,61 @@ nv.models.lineWithInlineFocusChart = function() {
       //------------------------------------------------------------
 
 
+      function clampBrushExtent() {
+        var extent = brush.extent(), values = data[0].values, extentIndexes,
+            minimumSelectionSize = 2, selectionSize, diff;
+
+        brushExtent = brush.empty() ? null : extent;
+        extentIndexes = extent.map(function(val) {
+          return nv.interactiveBisect(values, val);
+        });
+        selectionSize = Math.abs(extentIndexes[0] - extentIndexes[1]);
+
+        if (selectionSize  < minimumSelectionSize) {
+          diff = minimumSelectionSize - selectionSize;
+          if ((extentIndexes[1] + diff) >= values.length) {
+            extentIndexes[1] = values.length - 1;
+            selectionSize = Math.abs(extentIndexes[0] - extentIndexes[1]);
+            diff = minimumSelectionSize - selectionSize;
+
+            if ((extentIndexes[0] - diff) , 0) {
+              return false;
+            } else {
+              extentIndexes[0] = extentIndexes[0] - diff;
+            }
+          } else {
+            extentIndexes[1] = extentIndexes[1] + diff;
+          }
+        }
+        d3.select(this).call(brush.extent(extentIndexes.map(function(val) {
+          return values[val].x;
+        })));
+        return true;
+      }
 
       function onBrush() {
-        brushExtent = brush.empty() ? null : brush.extent();
-        var extent = brush.empty() ? x2.domain() : brush.extent();
-        var filteredData = data.filter(function(d) {
-          return !d.disabled;
-        }).map(function(d, i) {
-          return {
-            key: d.key,
-            values: d.values.filter(function(d, i) {
-              return lines.x()(d, i) >= extent[0] &&
-                lines.x()(d,i) <= extent[1];
-            })
-          }
-        });
-
-        if (!allowBrushExtent(extent, filteredData)) {
-          dispatch.clearFocus();
+        if(!clampBrushExtent.call(this)) {
           return;
         }
-        dispatch.brush({extent: extent, brush: brush, filteredData: filteredData});
+        brushExtent = brush.empty() ? null : brush.extent();
+        var extent = brush.empty() ? x2.domain() : brush.extent();
+        dispatch.brush({extent: extent, brush: brush});
+
+
         // Update Main (Focus)
         var focusLinesWrap = g.select('.nv-focus .nv-linesWrap')
-            .datum(filteredData);
+            .datum(
+              data
+                .filter(function(d) { return !d.disabled })
+                .map(function(d,i) {
+                  return {
+                    key: d.key,
+                    values: d.values.filter(function(d,i) {
+                      return lines.x()(d,i) >= extent[0] && lines.x()(d,i) <= extent[1];
+                    })
+                  }
+                })
+            );
         focusLinesWrap.transition().duration(transitionDuration).call(lines);
 
 
@@ -628,12 +657,6 @@ nv.models.lineWithInlineFocusChart = function() {
     legendOrientation = _;
     return chart;
   };
-
-  chart.allowBrushExtent = function(_) {
-    if (!arguments.length) return allowBrushExtent;
-    allowBrushExtent = _;
-    return chart;
-  }
 
   //============================================================
 
