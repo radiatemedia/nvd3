@@ -145,7 +145,6 @@ nv.models.lineWithInlineFocusChart = function() {
       var g = wrap.select('g');
 
       gEnter.append('g').attr('class', 'nv-legendWrap');
-      gEnter.append('g').attr('class', 'nv-interactive');
 
       var focusEnter = gEnter.append('g').attr('class', 'nv-focus');
       focusEnter.append('g').attr('class', 'nv-brushBackground');
@@ -154,6 +153,7 @@ nv.models.lineWithInlineFocusChart = function() {
       focusEnter.append('g').attr('class', 'nv-y nv-axis');
       focusEnter.append('g').attr('class', 'nv-linesWrap');
 
+      gEnter.append('g').attr('class', 'nv-interactive');
       var contextEnter = gEnter.append('g').attr('class', 'nv-context');
       contextEnter.append('g').attr('class', 'nv-linesWrap');
 
