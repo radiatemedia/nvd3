@@ -429,7 +429,7 @@ nv.models.lineWithInlineFocusChart = function() {
             selectionSize = Math.abs(extentIndexes[0] - extentIndexes[1]);
             diff = minimumSelectionSize - selectionSize;
 
-            if ((extentIndexes[0] - diff) , 0) {
+            if ((extentIndexes[0] - diff) < 0) {
               return false;
             } else {
               extentIndexes[0] = extentIndexes[0] - diff;
@@ -445,11 +445,10 @@ nv.models.lineWithInlineFocusChart = function() {
       }
 
       function onBrush() {
+        var extent = brush.empty() ? x2.domain() : brush.extent();
         if(!clampBrushExtent.call(this)) {
           return;
         }
-        brushExtent = brush.empty() ? null : brush.extent();
-        var extent = brush.empty() ? x2.domain() : brush.extent();
         dispatch.brush({extent: extent, brush: brush});
 
 
