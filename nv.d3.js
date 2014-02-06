@@ -5269,7 +5269,9 @@ nv.models.line = function() {
 
       wrap.select('#nv-edge-clip-' + scatter.id() + ' rect')
           .attr('width', availableWidth)
-          .attr('height', availableHeight);
+          .attr('height', availableHeight + 20)
+          .attr('transform', "translate(0,-10)");
+
 
       g   .attr('clip-path', clipEdge ? 'url(#nv-edge-clip-' + scatter.id() + ')' : '');
       scatterWrap
@@ -11817,7 +11819,8 @@ nv.models.scatter = function() {
 
       wrap.select('#nv-edge-clip-' + id + ' rect')
           .attr('width', availableWidth)
-          .attr('height', availableHeight);
+          .attr('height', availableHeight + 20)
+          .attr('transform', "translate(0,-10)");
 
       g   .attr('clip-path', clipEdge ? 'url(#nv-edge-clip-' + id + ')' : '');
 
