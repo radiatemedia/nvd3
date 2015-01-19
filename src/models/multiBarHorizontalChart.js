@@ -9,6 +9,7 @@ nv.models.multiBarHorizontalChart = function() {
     , xAxis = nv.models.axis()
     , yAxis = nv.models.axis()
     , legend = nv.models.legend().height(30)
+    , legendOrientation = 'top'
     , controls = nv.models.legend().height(30)
     ;
 
@@ -30,7 +31,7 @@ nv.models.multiBarHorizontalChart = function() {
     , defaultState = null
     , noData = 'No Data Available.'
     , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState')
-    , controlWidth = function() { return showControls ? 180 : 0 }
+    , controlWidth = function() { return showControls ? 90 : 0 }
     , transitionDuration = 250
     ;
 
@@ -149,8 +150,11 @@ nv.models.multiBarHorizontalChart = function() {
       //------------------------------------------------------------
       // Legend
 
+      var containerHeight = (height || parseInt(container.style('height')) || 400),
+          legendTransform = -margin.top;
+
       if (showLegend) {
-        legend.width(availableWidth - controlWidth());
+        legend.width(availableWidth);
 
         if (multibar.barColor())
           data.forEach(function(series,i) {
@@ -161,14 +165,19 @@ nv.models.multiBarHorizontalChart = function() {
             .datum(data)
             .call(legend);
 
-        if ( margin.top != legend.height()) {
-          margin.top = legend.height();
-          availableHeight = (height || parseInt(container.style('height')) || 400)
-                             - margin.top - margin.bottom;
+        if (legendOrientation = 'bottom') {
+          legendTransform = containerHeight - margin.top - legend.height();
+        } else {
+          if ( margin.top != legend.height()) {
+            margin.top = legend.height();
+          }
+          legendTransform = -margin.top;
         }
+        availableHeight = containerHeight - margin.top - margin.bottom;
 
         g.select('.nv-legendWrap')
-            .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) +')');
+            .attr('transform', 'translate(60,' + legendTransform +')');
+        legendTransform = legendTransform - legend.height();
       }
 
       //------------------------------------------------------------
@@ -186,7 +195,7 @@ nv.models.multiBarHorizontalChart = function() {
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
         g.select('.nv-controlsWrap')
             .datum(controlsData)
-            .attr('transform', 'translate(0,' + (-margin.top) +')')
+            .attr('transform', 'translate(0,' + (legendTransform) +')')
             .call(controls);
       }
 
@@ -425,6 +434,12 @@ nv.models.multiBarHorizontalChart = function() {
   chart.transitionDuration = function(_) {
     if (!arguments.length) return transitionDuration;
     transitionDuration = _;
+    return chart;
+  };
+
+  chart.legendOrientation = function(_) {
+    if (!arguments.length) return legendOrientation;
+    legendOrientation = _;
     return chart;
   };
   //============================================================

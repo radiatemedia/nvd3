@@ -9,6 +9,7 @@ nv.models.multiBarChart = function() {
     , xAxis = nv.models.axis()
     , yAxis = nv.models.axis()
     , legend = nv.models.legend()
+    , legendOrientation = 'top'
     , controls = nv.models.legend()
     ;
 
@@ -153,6 +154,9 @@ nv.models.multiBarChart = function() {
       //------------------------------------------------------------
       // Legend
 
+      var containerHeight = (height || parseInt(container.style('height')) || 400),
+          legendTransform = -margin.top;
+
       if (showLegend) {
         legend.width(availableWidth - controlWidth());
 
@@ -165,14 +169,18 @@ nv.models.multiBarChart = function() {
             .datum(data)
             .call(legend);
 
-        if ( margin.top != legend.height()) {
-          margin.top = legend.height();
-          availableHeight = (height || parseInt(container.style('height')) || 400)
-                             - margin.top - margin.bottom;
+        if (legendOrientation = 'bottom') {
+          legendTransform = containerHeight - margin.top - legend.height();
+        } else {
+          if ( margin.top != legend.height()) {
+            margin.top = legend.height();
+          }
+          legendTransform = -margin.top;
         }
+        availableHeight = containerHeight - margin.top - margin.bottom;
 
         g.select('.nv-legendWrap')
-            .attr('transform', 'translate(' + controlWidth() + ',' + (-margin.top) +')');
+            .attr('transform', 'translate(' + controlWidth() + ',' + (legendTransform) +')');
       }
 
       //------------------------------------------------------------
@@ -190,7 +198,7 @@ nv.models.multiBarChart = function() {
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
         g.select('.nv-controlsWrap')
             .datum(controlsData)
-            .attr('transform', 'translate(0,' + (-margin.top) +')')
+            .attr('transform', 'translate(0,' + (legendTransform) +')')
             .call(controls);
       }
 
@@ -504,7 +512,7 @@ nv.models.multiBarChart = function() {
     defaultState = _;
     return chart;
   };
-  
+
   chart.noData = function(_) {
     if (!arguments.length) return noData;
     noData = _;
@@ -514,6 +522,11 @@ nv.models.multiBarChart = function() {
   chart.transitionDuration = function(_) {
     if (!arguments.length) return transitionDuration;
     transitionDuration = _;
+    return chart;
+  };
+  chart.legendOrientation = function(_) {
+    if (!arguments.length) return legendOrientation;
+    legendOrientation = _;
     return chart;
   };
 
