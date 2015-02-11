@@ -176,8 +176,8 @@ nv.models.multiBarHorizontalChart = function() {
         availableHeight = containerHeight - margin.top - margin.bottom;
 
         g.select('.nv-legendWrap')
-            .attr('transform', 'translate(60,' + legendTransform +')');
-        legendTransform = legendTransform - legend.height();
+            .attr('transform', 'translate(0,' + legendTransform +')');
+        // legendTransform = legendTransform - legend.height();
       }
 
       //------------------------------------------------------------
@@ -187,7 +187,8 @@ nv.models.multiBarHorizontalChart = function() {
       // Controls
 
       if (showControls) {
-        var controlsData = [
+        var containerHeight = 40,
+            controlsData = [
           { key: 'Grouped', disabled: multibar.stacked() },
           { key: 'Stacked', disabled: !multibar.stacked() }
         ];
@@ -195,7 +196,7 @@ nv.models.multiBarHorizontalChart = function() {
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
         g.select('.nv-controlsWrap')
             .datum(controlsData)
-            .attr('transform', 'translate(0,' + (legendTransform) +')')
+            .attr('transform', 'translate(0,' + (legendTransform - containerHeight) +')')
             .call(controls);
       }
 
